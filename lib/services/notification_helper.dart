@@ -38,10 +38,11 @@ class NotificationHelper {
 
   static Future<void> _showImmediateNotification(
       Map<String, dynamic> task) async {
+    print("🚨 بيانات المهمة الفورية: $task");
     await _plugin.show(
       task['title'].hashCode,
       '📌 تذكير بمهمة',
-      "المهمة '${task['title']}' ستبدأ بعد قليل",
+      "المهمة '${task['title'] ?? 'بدون عنوان'}' ستبدأ بعد قليل",
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'task_channel_id',
@@ -51,6 +52,8 @@ class NotificationHelper {
           priority: Priority.max,
           playSound: true,
           fullScreenIntent: true,
+          ongoing: true, // 🔥 يجعل الإشعار ثابت
+          autoCancel: false, // 🔥 لا يغلق تلقائيًا
         ),
       ),
     );
@@ -58,10 +61,12 @@ class NotificationHelper {
 
   static Future<void> _scheduleExactNotification(
       Map<String, dynamic> task, DateTime reminderTime) async {
+    print("⏰ بيانات المهمة المجدولة: $task");
+    print("📅 وقت الجدولة: $reminderTime");
     await _plugin.zonedSchedule(
       task['title'].hashCode,
       '📌 تذكير بمهمة قادمة',
-      "${task['title']} ستبدأ بعد 5 دقائق",
+      "${task['title'] ?? 'بدون عنوان'} ستبدأ بعد 5 دقائق",
       tz.TZDateTime.from(reminderTime, tz.local),
       const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -71,6 +76,8 @@ class NotificationHelper {
           importance: Importance.max,
           priority: Priority.max,
           playSound: true,
+          ongoing: true, // 🔥 يخليه ثابت
+          autoCancel: false, // 🔥 مايختفيش لوحده
         ),
       ),
       androidAllowWhileIdle: true,
@@ -94,6 +101,8 @@ class NotificationHelper {
           priority: Priority.max,
           playSound: true,
           fullScreenIntent: true,
+          ongoing: true, // 🔥 ثابت
+          autoCancel: false, // 🔥 مايختفيش
         ),
       ),
     );
