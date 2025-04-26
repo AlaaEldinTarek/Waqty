@@ -17,6 +17,9 @@ dependencies:
   timezone: ^0.9.2
   audioplayers: ^5.2.1
   lottie: ^2.6.0
+  simple_animations: ^5.0.0
+  permission_handler: ^11.0.1
+
 
 
 
@@ -38,7 +41,11 @@ flutter:
     -  assets/logo_animation.json
     -  assets/sounds/intro_chime.mp3
     -  assets/icons/app_icon.png
-    -  assets/lottie/Animation - 1745156917515.json
+    -  assets/lottie/Animation-1745156917515.json
+    -  assets/animation/Animation-1745156917515.json
+    -  assets/images/logo_white.png
+
+
 
 fonts:
   - family: Cairo

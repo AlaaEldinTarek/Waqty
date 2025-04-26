@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +12,8 @@ void main() async {
 
   runApp(MyApp(isDarkMode: isDarkMode));
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   final bool isDarkMode;
@@ -27,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _isDarkMode = widget.isDarkMode;
+    NotificationService.initialize();
   }
 
   void toggleTheme(bool isDark) async {
@@ -42,6 +46,7 @@ class _MyAppState extends State<MyApp> {
       title: 'وقتي',
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar')],
+      navigatorKey: navigatorKey,
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -94,7 +99,9 @@ class _MyAppState extends State<MyApp> {
           foregroundColor: Colors.white,
         ),
       ),
-      home: const SplashScreen(),
+      home: SplashScreen(
+        onToggleTheme: toggleTheme,
+      ),
     );
   }
 }

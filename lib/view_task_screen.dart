@@ -1,11 +1,18 @@
+// تم التحديث لإظهار أيقونة الجرس إذا كانت المهمة تحتوي على تذكير
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'add_task_page.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 class ViewTasksScreen extends StatefulWidget {
   final void Function(bool) onToggleTheme;
-  const ViewTasksScreen({super.key, required this.onToggleTheme});
+  final String? initialPayload;
+  const ViewTasksScreen({
+    super.key,
+    required this.onToggleTheme,
+    this.initialPayload,
+  });
 
   @override
   State<ViewTasksScreen> createState() => _ViewTasksScreenState();
@@ -18,6 +25,10 @@ class _ViewTasksScreenState extends State<ViewTasksScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialPayload != null) {
+      print("📩 Payload received from notification: ${widget.initialPayload}");
+      // ممكن تعمل بيها فلترة أو عرض معين
+    }
     _loadTasks();
   }
 
@@ -129,54 +140,122 @@ class _ViewTasksScreenState extends State<ViewTasksScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            task['title'],
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color:
-                                  Theme.of(context).textTheme.bodyLarge!.color,
-                            ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  task['title'],
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color,
+                                  ),
+                                ),
+                              ),
+                              if (task['reminderEnabled'] == true)
+                                const Padding(
+                                  padding: EdgeInsets.only(right: 8.0),
+                                  child: Icon(Icons.notifications_active,
+                                      color: Colors.orangeAccent),
+                                ),
+                            ],
                           ),
                           if (isExpanded) ...[
                             const SizedBox(height: 6),
-                            Text(
-                              task['details'] ?? '',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .color,
-                              ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.notes,
+                                  size: 20,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  task['details'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 6),
-                            Text(
-                              'المجموعة: ${task['group'] ?? ''}',
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .color,
-                              ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.folder,
+                                  size: 20,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'المجموعة: ${task['group'] ?? ''}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'التكرار: ${task['repeat'] ?? ''}',
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .color,
-                              ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.repeat,
+                                  size: 20,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'التكرار: ${task['repeat'] ?? ''}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'الوقت: ${task['dateTime'] ?? ''}',
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .color,
-                              ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  size: 20,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge!
+                                      .color,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'الوقت و التاريخ: ${DateFormat('hh:mm', 'ar').format(DateTime.parse(task['dateTime']))} ${DateFormat('a', 'ar').format(DateTime.parse(task['dateTime']))} – ${DateFormat('d MMMM yyyy', 'ar').format(DateTime.parse(task['dateTime']))}',
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge!
+                                        .color,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 12),
                             Row(

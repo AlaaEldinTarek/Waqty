@@ -43,3 +43,34 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Flutter/Dart/Pub related
+.packages
+build/
+.melos_tool/
+
+
+
+# VS Code related
+.vscode/
+
+# Android Studio/Gradle
+android/.gradle/
+android/captures/
+android/gradle/
+android/local.properties
+
+# iOS/Xcode
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/
+ios/Pods/
+ios/.symlinks/
+ios/DerivedData/
+
+# Others
+*.lock
+*.tmp
+*.DS_Store

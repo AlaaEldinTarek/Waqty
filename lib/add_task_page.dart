@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../services/notification_service.dart';
 
 class AddTaskPage extends StatefulWidget {
   final Map<String, dynamic>? existingTask;
@@ -19,6 +20,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
   DateTime? _selectedDateTime;
   String _selectedRepeat = 'none';
   String _selectedGroup = 'شخصي';
+  bool _enableReminder = false;
+  double _reminderMinutes = 5;
 
   final List<Map<String, dynamic>> _defaultGroups = [
     {'name': 'شخصي', 'color': Colors.pinkAccent},
@@ -40,6 +43,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
           DateTime.tryParse(widget.existingTask!['dateTime'] ?? '');
       _selectedRepeat = widget.existingTask!['repeat'] ?? 'none';
       _selectedGroup = widget.existingTask!['group'] ?? '';
+      _enableReminder = widget.existingTask!['reminderEnabled'] ?? false;
     }
   }
 
@@ -193,6 +197,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         'groupColor': (_defaultGroups + _customGroups)
             .firstWhere((g) => g['name'] == _selectedGroup)['color']
             .value,
+        'reminderEnabled': _enableReminder,
       };
 
       if (widget.taskIndex != null) {
@@ -200,9 +205,20 @@ class _AddTaskPageState extends State<AddTaskPage> {
       } else {
         tasks.add(newTask);
       }
-
+      if (_enableReminder) {
+        Future.delayed(
+          Duration(minutes: _reminderMinutes.round()),
+          () {
+            NotificationService.showReminderNotification(
+              id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+              title: '📌 تذكير بمهمة',
+              body: _titleController.text.trim(),
+              payload: _titleController.text.trim(), // اسم المهمة أو ID مميز
+            );
+          },
+        );
+      }
       await prefs.setString('tasks', jsonEncode(tasks));
-      await NotificationHelper.showNotificationBeforeTask(newTask); // ✅ تم إضافة تفعيل الإشعار بعد حفظ المهمة
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -367,6 +383,35 @@ class _AddTaskPageState extends State<AddTaskPage> {
                         color: Color(0xffffffff))),
               )),
         ],
+      ],
+    );
+  }
+
+  Widget _buildReminderSection() {
+    return Column(
+      children: [
+        CheckboxListTile(
+          title: const Text('تفعيل التذكير'),
+          value: _enableReminder,
+          onChanged: (value) => setState(() => _enableReminder = value!),
+        ),
+        if (_enableReminder)
+          Column(
+            children: [
+              const Text('اختيار مدة التذكير (بالدقائق)',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Slider(
+                value: _reminderMinutes,
+                min: 5,
+                max: 60,
+                divisions: 11,
+                label: '${_reminderMinutes.round()} دقيقة',
+                onChanged: (value) {
+                  setState(() => _reminderMinutes = value);
+                },
+              ),
+            ],
+          )
       ],
     );
   }
@@ -563,6 +608,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
               ),
               const SizedBox(height: 5),
               _buildGroupSection(_customGroups),
+              const SizedBox(height: 20),
+              _buildReminderSection(),
               const SizedBox(height: 20),
               _buildGradientButton(),
             ],
