@@ -1,0 +1,57 @@
+name: waqti
+description: تطبيق وقتي لتنظيم المهام وتذكير المستخدم بها
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: 16.1.0
+  shared_preferences: ^2.2.2
+  google_fonts: ^6.1.0
+  intl: ^0.19.0
+  uuid: ^4.0.0
+  timezone: ^0.9.2
+  audioplayers: ^5.2.1
+  lottie: ^2.6.0
+
+
+
+
+  # دعم اللغة العربية
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    -  assets/logo.png
+    -  assets/logo_animation.json
+    -  assets/sounds/intro_chime.mp3
+    -  assets/icons/app_icon.png
+    -  assets/lottie/Animation - 1745156917515.json
+
+fonts:
+  - family: Cairo
+    fonts:
+      - asset: assets/fonts/Cairo-Regular.ttf
+
+flutter_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#000080" # أو اللون اللي تحبه للخلفية
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  remove_alpha_ios: true
+
+
+
