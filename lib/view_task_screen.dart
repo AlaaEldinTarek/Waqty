@@ -306,8 +306,41 @@ class _ViewTasksScreenState extends State<ViewTasksScreen> {
           label: const Text('إضافة مهمة'),
           onPressed: () async {
             await Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const AddTaskPage()))
-                .then((_) => _loadTasks());
+                .push(
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const AddTaskPage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  var curve = Curves.fastLinearToSlowEaseIn;
+                  var curvedAnimation =
+                      CurvedAnimation(parent: animation, curve: curve);
+
+                  return ScaleTransition(
+                    scale: Tween<double>(begin: 0.1, end: 1.0)
+                        .animate(curvedAnimation),
+                    child: FadeTransition(
+                      opacity: curvedAnimation,
+                      child: child,
+                    ),
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 1200),
+              ),
+            )
+                .then((result) {
+              if (result == 'added' || result == 'edited') {
+                _loadTasks();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(result == 'added'
+                        ? '✅ تمت إضافة المهمة بنجاح'
+                        : '✏️ تم تعديل المهمة بنجاح'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            });
           },
         ),
       ),

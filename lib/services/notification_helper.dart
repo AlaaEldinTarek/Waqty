@@ -133,4 +133,9 @@ class NotificationHelper {
       ),
     );
   }
+
+  static Future<void> cancelNotification(String title) async {
+    await _plugin.cancel(title.hashCode);
+    print("🚫 تم إلغاء إشعار المهمة: $title");
+  }
 }

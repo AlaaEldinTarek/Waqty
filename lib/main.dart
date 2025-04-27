@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final isDarkMode = prefs.getBool('isDarkMode') ?? false;
-
+  await NotificationService.initialize();
   runApp(MyApp(isDarkMode: isDarkMode));
 }
 

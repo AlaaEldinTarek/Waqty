@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../services/notification_service.dart';
+import '../services/notification_helper.dart';
 
 class AddTaskPage extends StatefulWidget {
   final Map<String, dynamic>? existingTask;
@@ -13,7 +13,8 @@ class AddTaskPage extends StatefulWidget {
   State<AddTaskPage> createState() => _AddTaskPageState();
 }
 
-class _AddTaskPageState extends State<AddTaskPage> {
+class _AddTaskPageState extends State<AddTaskPage>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _detailsController = TextEditingController();
@@ -22,6 +23,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
   String _selectedGroup = 'شخصي';
   bool _enableReminder = false;
   double _reminderMinutes = 5;
+
+  late AnimationController _controller;
+  late List<Animation<double>> _fadeAnimations;
 
   final List<Map<String, dynamic>> _defaultGroups = [
     {'name': 'شخصي', 'color': Colors.pinkAccent},
@@ -45,6 +49,34 @@ class _AddTaskPageState extends State<AddTaskPage> {
       _selectedGroup = widget.existingTask!['group'] ?? '';
       _enableReminder = widget.existingTask!['reminderEnabled'] ?? false;
     }
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1300),
+    );
+
+    _fadeAnimations = List.generate(10, (index) {
+      double start = (index * 0.1);
+      double end = start + 0.4;
+      if (end > 1.0) end = 1.0;
+      return Tween<double>(begin: 0, end: 1).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(start, end, curve: Curves.easeIn),
+        ),
+      );
+    });
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _titleController.dispose();
+    _detailsController.dispose();
+
+    super.dispose();
   }
 
   Future<void> _loadCustomGroups() async {
@@ -188,6 +220,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
       final tasksJson = prefs.getString('tasks');
       List tasks = tasksJson != null ? jsonDecode(tasksJson) : [];
 
+      if (widget.existingTask != null) {
+        await NotificationHelper.cancelNotification(
+            widget.existingTask!['title']);
+      }
+
       final newTask = {
         'title': _titleController.text.trim(),
         'details': _detailsController.text.trim(),
@@ -200,25 +237,17 @@ class _AddTaskPageState extends State<AddTaskPage> {
         'reminderEnabled': _enableReminder,
       };
 
-      if (widget.taskIndex != null) {
+      if (widget.existingTask != null && widget.taskIndex != null) {
         tasks[widget.taskIndex!] = newTask;
       } else {
         tasks.add(newTask);
       }
-      if (_enableReminder) {
-        Future.delayed(
-          Duration(minutes: _reminderMinutes.round()),
-          () {
-            NotificationService.showReminderNotification(
-              id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-              title: '📌 تذكير بمهمة',
-              body: _titleController.text.trim(),
-              payload: _titleController.text.trim(), // اسم المهمة أو ID مميز
-            );
-          },
-        );
-      }
+
       await prefs.setString('tasks', jsonEncode(tasks));
+
+      if (newTask['reminderEnabled'] == true) {
+        await NotificationHelper.showNotificationBeforeTask(newTask);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -227,7 +256,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
               : 'تمت إضافة المهمة بنجاح'),
         ),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, widget.taskIndex != null ? 'edited' : 'added');
     }
   }
 
@@ -559,31 +588,52 @@ class _AddTaskPageState extends State<AddTaskPage> {
           key: _formKey,
           child: Column(
             children: [
-              _buildTextField(
-                  controller: _titleController, label: 'عنوان المهمة'),
+              FadeTransition(
+                opacity: _fadeAnimations[0],
+                child: _buildTextField(
+                    controller: _titleController, label: 'عنوان المهمة'),
+              ),
               const SizedBox(height: 10),
-              _buildTextField(
-                  controller: _detailsController,
-                  label: 'تفاصيل المهمة',
-                  maxLines: 4),
+              FadeTransition(
+                opacity: _fadeAnimations[1],
+                child: _buildTextField(
+                    controller: _detailsController,
+                    label: 'تفاصيل المهمة',
+                    maxLines: 4),
+              ),
               const SizedBox(height: 10),
-              _buildDateTimePicker(context),
+              FadeTransition(
+                opacity: _fadeAnimations[2],
+                child: _buildDateTimePicker(context),
+              ),
               const SizedBox(height: 10),
-              _buildDropdownRepeat(),
+              FadeTransition(
+                opacity: _fadeAnimations[3],
+                child: _buildDropdownRepeat(),
+              ),
               const SizedBox(height: 20),
-              const Align(
-                alignment: Alignment.centerRight,
-                child: Text('المجموعات الافتراضية:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+              FadeTransition(
+                opacity: _fadeAnimations[4],
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('المجموعات الافتراضية:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
               ),
               const SizedBox(height: 5),
-              _buildGroupSection(_defaultGroups),
+              FadeTransition(
+                opacity: _fadeAnimations[5],
+                child: _buildGroupSection(_defaultGroups),
+              ),
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Text(
-                    'مجموعاتي',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  FadeTransition(
+                    opacity: _fadeAnimations[6],
+                    child: Text(
+                      'مجموعاتي',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
@@ -607,11 +657,20 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 ],
               ),
               const SizedBox(height: 5),
-              _buildGroupSection(_customGroups),
+              FadeTransition(
+                opacity: _fadeAnimations[7],
+                child: _buildGroupSection(_customGroups),
+              ),
               const SizedBox(height: 20),
-              _buildReminderSection(),
+              FadeTransition(
+                opacity: _fadeAnimations[8],
+                child: _buildReminderSection(),
+              ),
               const SizedBox(height: 20),
-              _buildGradientButton(),
+              FadeTransition(
+                opacity: _fadeAnimations[9],
+                child: _buildGradientButton(),
+              ),
             ],
           ),
         ),
