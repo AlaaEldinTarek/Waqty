@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../services/notification_helper.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/custom_datetime_picker.dart';
+import '../widgets/repeat_dropdown.dart';
 
 class AddTaskPage extends StatefulWidget {
   final Map<String, dynamic>? existingTask;
@@ -47,7 +50,7 @@ class _AddTaskPageState extends State<AddTaskPage>
           DateTime.tryParse(widget.existingTask!['dateTime'] ?? '');
       _selectedRepeat = widget.existingTask!['repeat'] ?? 'none';
       _selectedGroup = widget.existingTask!['group'] ?? '';
-      _enableReminder = widget.existingTask!['reminderEnabled'] ?? false;
+      _enableReminder = widget.existingTask!['reminderEnabled'] ?? '';
     }
 
     _controller = AnimationController(
@@ -77,6 +80,13 @@ class _AddTaskPageState extends State<AddTaskPage>
     _detailsController.dispose();
 
     super.dispose();
+  }
+
+  Future<void> _reverseAndPop(String result) async {
+    await _controller.reverse();
+    if (mounted) {
+      Navigator.pop(context, result);
+    }
   }
 
   Future<void> _loadCustomGroups() async {
@@ -130,16 +140,16 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 10),
               Wrap(
-                spacing: 10,
+                spacing: 5,
                 children: [
                   Colors.brown,
                   Colors.cyan,
                   Colors.indigo,
-                  Colors.amber,
+                  Colors.yellowAccent,
                   Colors.deepOrange,
                   Colors.lime,
                   Colors.blueAccent,
-                  Colors.pinkAccent,
+                  Colors.pink,
                   Colors.tealAccent,
                   Colors.purple
                 ].map((color) {
@@ -194,6 +204,7 @@ class _AddTaskPageState extends State<AddTaskPage>
                   });
                   _saveCustomGroups();
                   Navigator.pop(context);
+                  _loadCustomGroups();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -252,95 +263,12 @@ class _AddTaskPageState extends State<AddTaskPage>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(widget.taskIndex != null
-              ? 'تم تعديل المهمة بنجاح'
-              : 'تمت إضافة المهمة بنجاح'),
+              ? 'تم تعديل المهمة بنجاح ✅'
+              : 'تمت إضافة المهمة بنجاح ✅'),
         ),
       );
-      Navigator.pop(context, widget.taskIndex != null ? 'edited' : 'added');
+      _reverseAndPop(widget.taskIndex != null ? 'edited' : 'added');
     }
-  }
-
-  Widget _buildTextField(
-      {required TextEditingController controller,
-      required String label,
-      int maxLines = 1}) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      validator: (value) =>
-          value == null || value.isEmpty ? 'هذا الحقل مطلوب' : null,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Theme.of(context).cardColor,
-      ),
-    );
-  }
-
-  Widget _buildDateTimePicker(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2100),
-        );
-        if (date != null) {
-          final time = await showTimePicker(
-            context: context,
-            initialTime: TimeOfDay.now(),
-          );
-          if (time != null) {
-            setState(() {
-              _selectedDateTime = DateTime(
-                  date.year, date.month, date.day, time.hour, time.minute);
-            });
-          }
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface),
-        ),
-        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 16),
-        child: Text(
-          _selectedDateTime == null
-              ? 'اختيار التاريخ والوقت'
-              : _selectedDateTime.toString(),
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).textTheme.bodyLarge!.color,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDropdownRepeat() {
-    return DropdownButtonFormField<String>(
-      value: _selectedRepeat,
-      items: const [
-        DropdownMenuItem(value: 'none', child: Text('لا تكرار')),
-        DropdownMenuItem(value: 'daily', child: Text('يوميًا')),
-        DropdownMenuItem(value: 'alternate', child: Text('يوم ويوم')),
-        DropdownMenuItem(value: 'weekly', child: Text('أسبوعيًا')),
-        DropdownMenuItem(value: 'monthly', child: Text('شهريًا')),
-      ],
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Theme.of(context).cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        labelText: 'تكرار المهمة',
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-      ),
-      onChanged: (value) => setState(() => _selectedRepeat = value!),
-    );
   }
 
   Widget _buildGroupSection(List<Map<String, dynamic>> groups) {
@@ -463,16 +391,16 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 10),
               Wrap(
-                spacing: 10,
+                spacing: 5,
                 children: [
                   Colors.brown,
                   Colors.cyan,
                   Colors.indigo,
-                  Colors.amber,
+                  Colors.yellowAccent,
                   Colors.deepOrange,
                   Colors.lime,
                   Colors.blueAccent,
-                  Colors.pinkAccent,
+                  Colors.pink,
                   Colors.tealAccent,
                   Colors.purple
                 ].map((color) {
@@ -480,8 +408,9 @@ class _AddTaskPageState extends State<AddTaskPage>
                   return GestureDetector(
                     onTap: () => setState(() => selectedColor = color),
                     child: Container(
-                      width: 30,
-                      height: 30,
+                      width: 34,
+                      height: 34,
+                      margin: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
@@ -510,6 +439,7 @@ class _AddTaskPageState extends State<AddTaskPage>
               onPressed: () {
                 setState(() => _customGroups.remove(group));
                 _saveCustomGroups();
+                _loadCustomGroups();
                 Navigator.pop(context);
               },
               child: const Text('حذف', style: TextStyle(color: Colors.red)),
@@ -526,6 +456,7 @@ class _AddTaskPageState extends State<AddTaskPage>
                     group['color'] = selectedColor;
                     _saveCustomGroups();
                   });
+                  _loadCustomGroups();
                   Navigator.pop(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -590,13 +521,13 @@ class _AddTaskPageState extends State<AddTaskPage>
             children: [
               FadeTransition(
                 opacity: _fadeAnimations[0],
-                child: _buildTextField(
+                child: CustomTextField(
                     controller: _titleController, label: 'عنوان المهمة'),
               ),
               const SizedBox(height: 10),
               FadeTransition(
                 opacity: _fadeAnimations[1],
-                child: _buildTextField(
+                child: CustomTextField(
                     controller: _detailsController,
                     label: 'تفاصيل المهمة',
                     maxLines: 4),
@@ -604,12 +535,35 @@ class _AddTaskPageState extends State<AddTaskPage>
               const SizedBox(height: 10),
               FadeTransition(
                 opacity: _fadeAnimations[2],
-                child: _buildDateTimePicker(context),
+                child: CustomDateTimePicker(
+                  selectedDateTime: _selectedDateTime,
+                  onDateTimeSelected: (newDateTime) {
+                    setState(() {
+                      _selectedDateTime = newDateTime;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
+              FadeTransition(
+                opacity: _fadeAnimations[4],
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('تكرار المهمة:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
               ),
               const SizedBox(height: 10),
               FadeTransition(
                 opacity: _fadeAnimations[3],
-                child: _buildDropdownRepeat(),
+                child: RepeatDropdown(
+                  selectedRepeat: _selectedRepeat,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedRepeat = value!;
+                    });
+                  },
+                ),
               ),
               const SizedBox(height: 20),
               FadeTransition(
@@ -630,10 +584,8 @@ class _AddTaskPageState extends State<AddTaskPage>
                 children: [
                   FadeTransition(
                     opacity: _fadeAnimations[6],
-                    child: Text(
-                      'مجموعاتي',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    child: const Text('مجموعاتي',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 8),
                   GestureDetector(
@@ -649,7 +601,7 @@ class _AddTaskPageState extends State<AddTaskPage>
                         ),
                       );
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.help_outline,
                       size: 18,
                     ),

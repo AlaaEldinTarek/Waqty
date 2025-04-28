@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../models/group_model.dart';
 
@@ -6,7 +5,8 @@ class GroupSelector extends StatefulWidget {
   final String? selectedGroupId;
   final Function(GroupModel) onGroupSelected;
 
-  const GroupSelector({super.key, this.selectedGroupId, required this.onGroupSelected});
+  const GroupSelector(
+      {super.key, this.selectedGroupId, required this.onGroupSelected});
 
   @override
   State<GroupSelector> createState() => _GroupSelectorState();
