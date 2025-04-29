@@ -225,6 +225,51 @@ class _AddTaskPageState extends State<AddTaskPage>
     );
   }
 
+  // void _submitTask() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final tasksJson = prefs.getString('tasks');
+  //     List tasks = tasksJson != null ? jsonDecode(tasksJson) : [];
+  //
+  //     if (widget.existingTask != null) {
+  //       await NotificationHelper.cancelNotification(
+  //           widget.existingTask!['title']);
+  //     }
+  //
+  //     final newTask = {
+  //       'title': _titleController.text.trim(),
+  //       'details': _detailsController.text.trim(),
+  //       'dateTime': _selectedDateTime!.toIso8601String(),
+  //       'repeat': _selectedRepeat,
+  //       'group': _selectedGroup,
+  //       'groupColor': (_defaultGroups + _customGroups)
+  //           .firstWhere((g) => g['name'] == _selectedGroup)['color']
+  //           .value,
+  //       'reminderEnabled': _enableReminder,
+  //     };
+  //
+  //     if (widget.existingTask != null && widget.taskIndex != null) {
+  //       tasks[widget.taskIndex!] = newTask;
+  //     } else {
+  //       tasks.add(newTask);
+  //     }
+  //
+  //     await prefs.setString('tasks', jsonEncode(tasks));
+  //
+  //     if (newTask['reminderEnabled'] == true) {
+  //       await NotificationHelper.showNotificationBeforeTask(newTask);
+  //     }
+  //
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(widget.taskIndex != null
+  //             ? 'تم تعديل المهمة بنجاح ✅'
+  //             : 'تمت إضافة المهمة بنجاح ✅'),
+  //       ),
+  //     );
+  //     _reverseAndPop(widget.taskIndex != null ? 'edited' : 'added');
+  //   }
+  // }
   void _submitTask() async {
     if (_formKey.currentState!.validate()) {
       final prefs = await SharedPreferences.getInstance();
@@ -256,18 +301,27 @@ class _AddTaskPageState extends State<AddTaskPage>
 
       await prefs.setString('tasks', jsonEncode(tasks));
 
+      // تشغيل الإشعار بدون await
       if (newTask['reminderEnabled'] == true) {
-        await NotificationHelper.showNotificationBeforeTask(newTask);
+        NotificationHelper.showNotificationBeforeTask(newTask);
       }
 
+      // رسالة نجاح
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(widget.taskIndex != null
-              ? 'تم تعديل المهمة بنجاح ✅'
-              : 'تمت إضافة المهمة بنجاح ✅'),
+              ? '✏️ تم تعديل المهمة بنجاح'
+              : '✅ تمت إضافة المهمة بنجاح'),
+          duration: const Duration(seconds: 2),
         ),
       );
-      _reverseAndPop(widget.taskIndex != null ? 'edited' : 'added');
+
+      // نرجع بعد شوية بسيط
+      if (widget.taskIndex != null) {
+        _reverseAndPop('edited');
+      } else {
+        _reverseAndPop('added');
+      }
     }
   }
 
