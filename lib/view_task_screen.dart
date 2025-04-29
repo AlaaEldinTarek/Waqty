@@ -305,6 +305,29 @@ class _ViewTasksScreenState extends State<ViewTasksScreen> {
           icon: const Icon(Icons.add),
           label: const Text('إضافة مهمة'),
           onPressed: () async {
+            // await Navigator.of(context)
+            //     .push(
+            //   PageRouteBuilder(
+            //     pageBuilder: (context, animation, secondaryAnimation) =>
+            //         const AddTaskPage(),
+            //     transitionsBuilder:
+            //         (context, animation, secondaryAnimation, child) {
+            //       var curve = Curves.fastLinearToSlowEaseIn;
+            //       var curvedAnimation =
+            //           CurvedAnimation(parent: animation, curve: curve);
+            //
+            //       return ScaleTransition(
+            //         scale: Tween<double>(begin: 0.9, end: 1.0)
+            //             .animate(curvedAnimation),
+            //         child: FadeTransition(
+            //           opacity: curvedAnimation,
+            //           child: child,
+            //         ),
+            //       );
+            //     },
+            //     transitionDuration: const Duration(milliseconds: 800),
+            //   ),
+            // )
             await Navigator.of(context)
                 .push(
               PageRouteBuilder(
@@ -312,20 +335,12 @@ class _ViewTasksScreenState extends State<ViewTasksScreen> {
                     const AddTaskPage(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
-                  var curve = Curves.fastLinearToSlowEaseIn;
-                  var curvedAnimation =
-                      CurvedAnimation(parent: animation, curve: curve);
-
-                  return ScaleTransition(
-                    scale: Tween<double>(begin: 0.1, end: 1.0)
-                        .animate(curvedAnimation),
-                    child: FadeTransition(
-                      opacity: curvedAnimation,
-                      child: child,
-                    ),
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
                   );
                 },
-                transitionDuration: const Duration(milliseconds: 1200),
+                transitionDuration: const Duration(milliseconds: 500),
               ),
             )
                 .then((result) {

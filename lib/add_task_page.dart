@@ -58,7 +58,7 @@ class _AddTaskPageState extends State<AddTaskPage>
       duration: const Duration(milliseconds: 1300),
     );
 
-    _fadeAnimations = List.generate(10, (index) {
+    _fadeAnimations = List.generate(20, (index) {
       double start = (index * 0.1);
       double end = start + 0.4;
       if (end > 1.0) end = 1.0;
@@ -271,6 +271,35 @@ class _AddTaskPageState extends State<AddTaskPage>
     }
   }
 
+  Widget _buildReminderSection() {
+    return Column(
+      children: [
+        CheckboxListTile(
+          title: const Text('تفعيل التذكير'),
+          value: _enableReminder,
+          onChanged: (value) => setState(() => _enableReminder = value!),
+        ),
+        if (_enableReminder)
+          Column(
+            children: [
+              const Text('اختيار مدة التذكير (بالدقائق)',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Slider(
+                value: _reminderMinutes,
+                min: 5,
+                max: 60,
+                divisions: 11,
+                label: '${_reminderMinutes.round()} دقيقة',
+                onChanged: (value) {
+                  setState(() => _reminderMinutes = value);
+                },
+              ),
+            ],
+          )
+      ],
+    );
+  }
+
   Widget _buildGroupSection(List<Map<String, dynamic>> groups) {
     final bool isCustom = groups == _customGroups;
     return Column(
@@ -344,39 +373,9 @@ class _AddTaskPageState extends State<AddTaskPage>
     );
   }
 
-  Widget _buildReminderSection() {
-    return Column(
-      children: [
-        CheckboxListTile(
-          title: const Text('تفعيل التذكير'),
-          value: _enableReminder,
-          onChanged: (value) => setState(() => _enableReminder = value!),
-        ),
-        if (_enableReminder)
-          Column(
-            children: [
-              const Text('اختيار مدة التذكير (بالدقائق)',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Slider(
-                value: _reminderMinutes,
-                min: 5,
-                max: 60,
-                divisions: 11,
-                label: '${_reminderMinutes.round()} دقيقة',
-                onChanged: (value) {
-                  setState(() => _reminderMinutes = value);
-                },
-              ),
-            ],
-          )
-      ],
-    );
-  }
-
   void _showEditGroupDialog(Map<String, dynamic> group) {
     final nameController = TextEditingController(text: group['name']);
     Color selectedColor = group['color'] ?? Colors.grey;
-
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
@@ -511,6 +510,12 @@ class _AddTaskPageState extends State<AddTaskPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            _reverseAndPop(widget.taskIndex != null ? '' : '');
+          },
+        ),
         title: const Text('إضافة مهمة'),
       ),
       body: SingleChildScrollView(
@@ -546,7 +551,7 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 10),
               FadeTransition(
-                opacity: _fadeAnimations[4],
+                opacity: _fadeAnimations[3],
                 child: const Align(
                   alignment: Alignment.centerRight,
                   child: Text('تكرار المهمة:',
@@ -555,7 +560,7 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 10),
               FadeTransition(
-                opacity: _fadeAnimations[3],
+                opacity: _fadeAnimations[4],
                 child: RepeatDropdown(
                   selectedRepeat: _selectedRepeat,
                   onChanged: (value) {
@@ -567,7 +572,7 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 20),
               FadeTransition(
-                opacity: _fadeAnimations[4],
+                opacity: _fadeAnimations[5],
                 child: const Align(
                   alignment: Alignment.centerRight,
                   child: Text('المجموعات الافتراضية:',
@@ -576,51 +581,54 @@ class _AddTaskPageState extends State<AddTaskPage>
               ),
               const SizedBox(height: 5),
               FadeTransition(
-                opacity: _fadeAnimations[5],
+                opacity: _fadeAnimations[6],
                 child: _buildGroupSection(_defaultGroups),
               ),
               const SizedBox(height: 20),
               Row(
                 children: [
                   FadeTransition(
-                    opacity: _fadeAnimations[6],
+                    opacity: _fadeAnimations[7],
                     child: const Text('مجموعاتي',
                         style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'يمكن تعديل مجموعاتي عن طريق الضغط المطول لمدة 3 ثواني.',
-                            style: TextStyle(color: Colors.white),
+                  FadeTransition(
+                    opacity: _fadeAnimations[7],
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'يمكن تعديل مجموعاتي عن طريق الضغط المطول لمدة 3 ثواني.',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            backgroundColor: Colors.red,
+                            duration: Duration(seconds: 3),
                           ),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 3),
-                        ),
-                      );
-                    },
-                    child: const Icon(
-                      Icons.help_outline,
-                      size: 18,
+                        );
+                      },
+                      child: const Icon(
+                        Icons.help_outline,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               FadeTransition(
-                opacity: _fadeAnimations[7],
+                opacity: _fadeAnimations[8],
                 child: _buildGroupSection(_customGroups),
               ),
               const SizedBox(height: 20),
               FadeTransition(
-                opacity: _fadeAnimations[8],
+                opacity: _fadeAnimations[9],
                 child: _buildReminderSection(),
               ),
               const SizedBox(height: 20),
               FadeTransition(
-                opacity: _fadeAnimations[9],
+                opacity: _fadeAnimations[10],
                 child: _buildGradientButton(),
               ),
             ],
