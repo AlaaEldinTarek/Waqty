@@ -1,15 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'screens/splash_screen.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'services/notification_service.dart';
+import 'services/workmanager_service.dart'; // تم الاستدعاء من هنا
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final isDarkMode = prefs.getBool('isDarkMode') ?? false;
-  await NotificationService.initialize();
+
+  tz.initializeTimeZones();
+
+  await Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: true,
+  );
+
+  await NotificationHelper.initialize();
+  await Permission.notification.request();
+
   runApp(MyApp(isDarkMode: isDarkMode));
 }
 
@@ -56,7 +72,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: GoogleFonts.cairo().fontFamily,
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF000080)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF000080)),
         scaffoldBackgroundColor: Colors.white,
         cardTheme: CardTheme(
           elevation: 8,
@@ -64,13 +80,13 @@ class _MyAppState extends State<MyApp> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          margin: EdgeInsets.all(12),
+          margin: const EdgeInsets.all(12),
         ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFF000080),
           foregroundColor: Colors.white,
         ),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF000080),
           foregroundColor: Colors.white,
         ),
@@ -80,21 +96,21 @@ class _MyAppState extends State<MyApp> {
         fontFamily: GoogleFonts.cairo().fontFamily,
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Color(0xFF000080), brightness: Brightness.dark),
-        scaffoldBackgroundColor: Color(0xFF121212),
+            seedColor: const Color(0xFF000080), brightness: Brightness.dark),
+        scaffoldBackgroundColor: const Color(0xFF121212),
         cardTheme: CardTheme(
           elevation: 8,
           shadowColor: Colors.white24,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          margin: EdgeInsets.all(12),
+          margin: const EdgeInsets.all(12),
         ),
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF000080),
           foregroundColor: Colors.white,
         ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFF000080),
           foregroundColor: Colors.white,
         ),

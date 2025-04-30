@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:workmanager/workmanager.dart';
 import 'dart:convert';
 import '../services/notification_helper.dart';
+import '../services/workmanager_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_datetime_picker.dart';
 import '../widgets/repeat_dropdown.dart';
@@ -303,7 +305,12 @@ class _AddTaskPageState extends State<AddTaskPage>
 
       // تشغيل الإشعار بدون await
       if (newTask['reminderEnabled'] == true) {
-        NotificationHelper.showNotificationBeforeTask(newTask);
+        Workmanager().registerOneOffTask(
+          'reminder_${DateTime.now().millisecondsSinceEpoch}',
+          'show_reminder_notification',
+          inputData: {"message": "📌 المهمة '${newTask['title']}' قرب وقتها!"},
+          initialDelay: Duration(minutes: reminderMinutes),
+        );
       }
 
       // رسالة نجاح
