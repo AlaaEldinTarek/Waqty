@@ -303,13 +303,20 @@ class _AddTaskPageState extends State<AddTaskPage>
 
       await prefs.setString('tasks', jsonEncode(tasks));
 
-      // تشغيل الإشعار بدون await
-      if (newTask['reminderEnabled'] == true) {
-        Workmanager().registerOneOffTask(
-          'reminder_${DateTime.now().millisecondsSinceEpoch}',
-          'show_reminder_notification',
-          inputData: {"message": "📌 المهمة '${newTask['title']}' قرب وقتها!"},
-          initialDelay: Duration(minutes: reminderMinutes),
+      // // تشغيل الإشعار بدون await
+      // if (newTask['reminderEnabled'] == true) {
+      //   Workmanager().registerOneOffTask(
+      //     'reminder_${DateTime.now().millisecondsSinceEpoch}',
+      //     'show_reminder_notification',
+      //     inputData: {"message": "📌 المهمة '${newTask['title']}' قرب وقتها!"},
+      //     initialDelay: Duration(minutes: reminderMinutes),
+      //   );
+      // }
+
+      if (_enableReminder) {
+        scheduleTaskReminder(
+          newTask['title'],
+          DateTime.parse(newTask['dateTime']),
         );
       }
 
