@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:workmanager/workmanager.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'services/background_service_initializer.dart';
 import 'services/notification_service.dart';
-import 'services/workmanager_service.dart'; // تم الاستدعاء من هنا
 import 'screens/splash_screen.dart';
 
 void main() async {
@@ -18,12 +17,8 @@ void main() async {
 
   tz.initializeTimeZones();
 
-  await Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: true,
-  );
+  await initializeService();
 
-  await NotificationHelper.initialize();
   await Permission.notification.request();
 
   runApp(MyApp(isDarkMode: isDarkMode));

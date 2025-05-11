@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:workmanager/workmanager.dart';
+
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+
+// import '../services/notification_helper.dart';
 import 'dart:convert';
-import '../services/notification_helper.dart';
-import '../services/workmanager_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_datetime_picker.dart';
 import '../widgets/repeat_dropdown.dart';
@@ -161,7 +163,8 @@ class _AddTaskPageState extends State<AddTaskPage>
                     child: Container(
                       width: 34,
                       height: 34,
-                      margin: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 3, vertical: 3),
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
@@ -227,61 +230,11 @@ class _AddTaskPageState extends State<AddTaskPage>
     );
   }
 
-  // void _submitTask() async {
-  //   if (_formKey.currentState!.validate()) {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final tasksJson = prefs.getString('tasks');
-  //     List tasks = tasksJson != null ? jsonDecode(tasksJson) : [];
-  //
-  //     if (widget.existingTask != null) {
-  //       await NotificationHelper.cancelNotification(
-  //           widget.existingTask!['title']);
-  //     }
-  //
-  //     final newTask = {
-  //       'title': _titleController.text.trim(),
-  //       'details': _detailsController.text.trim(),
-  //       'dateTime': _selectedDateTime!.toIso8601String(),
-  //       'repeat': _selectedRepeat,
-  //       'group': _selectedGroup,
-  //       'groupColor': (_defaultGroups + _customGroups)
-  //           .firstWhere((g) => g['name'] == _selectedGroup)['color']
-  //           .value,
-  //       'reminderEnabled': _enableReminder,
-  //     };
-  //
-  //     if (widget.existingTask != null && widget.taskIndex != null) {
-  //       tasks[widget.taskIndex!] = newTask;
-  //     } else {
-  //       tasks.add(newTask);
-  //     }
-  //
-  //     await prefs.setString('tasks', jsonEncode(tasks));
-  //
-  //     if (newTask['reminderEnabled'] == true) {
-  //       await NotificationHelper.showNotificationBeforeTask(newTask);
-  //     }
-  //
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(widget.taskIndex != null
-  //             ? 'تم تعديل المهمة بنجاح ✅'
-  //             : 'تمت إضافة المهمة بنجاح ✅'),
-  //       ),
-  //     );
-  //     _reverseAndPop(widget.taskIndex != null ? 'edited' : 'added');
-  //   }
-  // }
   void _submitTask() async {
     if (_formKey.currentState!.validate()) {
       final prefs = await SharedPreferences.getInstance();
       final tasksJson = prefs.getString('tasks');
       List tasks = tasksJson != null ? jsonDecode(tasksJson) : [];
-
-      if (widget.existingTask != null) {
-        await NotificationHelper.cancelNotification(
-            widget.existingTask!['title']);
-      }
 
       final newTask = {
         'title': _titleController.text.trim(),
@@ -303,23 +256,16 @@ class _AddTaskPageState extends State<AddTaskPage>
 
       await prefs.setString('tasks', jsonEncode(tasks));
 
-      // // تشغيل الإشعار بدون await
-      // if (newTask['reminderEnabled'] == true) {
-      //   Workmanager().registerOneOffTask(
-      //     'reminder_${DateTime.now().millisecondsSinceEpoch}',
-      //     'show_reminder_notification',
-      //     inputData: {"message": "📌 المهمة '${newTask['title']}' قرب وقتها!"},
-      //     initialDelay: Duration(minutes: reminderMinutes),
-      //   );
-      // }
-
       if (_enableReminder) {
-        scheduleTaskReminder(
-          newTask['title'],
-          DateTime.parse(newTask['dateTime']),
-        );
+        final now = DateTime.now();
+        final diff = _selectedDateTime!.difference(now);
+        if (diff.inSeconds > 0) {
+          FlutterBackgroundService().invoke("scheduleTask", {
+            "title": newTask['title'],
+            "delay": diff.inSeconds,
+          });
+        }
       }
-
       // رسالة نجاح
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -422,7 +368,7 @@ class _AddTaskPageState extends State<AddTaskPage>
         if (isCustom) ...[
           const SizedBox(height: 10),
           Container(
-              margin: EdgeInsets.only(top: 16),
+              margin: const EdgeInsets.only(top: 16),
               decoration: BoxDecoration(
                 color: Colors.greenAccent, // ← لون الخلفية الجديد
                 borderRadius: BorderRadius.circular(12),
@@ -477,7 +423,8 @@ class _AddTaskPageState extends State<AddTaskPage>
                     child: Container(
                       width: 34,
                       height: 34,
-                      margin: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 3, vertical: 3),
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
@@ -550,8 +497,8 @@ class _AddTaskPageState extends State<AddTaskPage>
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF000080),
-          foregroundColor: Color(0xffffffff),
+          backgroundColor: const Color(0xFF000080),
+          foregroundColor: const Color(0xffffffff),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -569,7 +516,7 @@ class _AddTaskPageState extends State<AddTaskPage>
           }
         },
         child: Text(widget.taskIndex != null ? 'حفظ التعديلات' : 'إضافة المهمة',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
       ),
     );
   }
