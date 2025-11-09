@@ -1,4 +1,4 @@
-# waqti
+# waqty
 
 A new Flutter project.
 

@@ -1,18 +1,18 @@
-name: waqti
-description: تطبيق وقتي لتنظيم المهام وتذكير المستخدم بها
+name: waqty
+description: "تطبيق وقتي لتنظيم المهام وتذكير المستخدم بها"
+
+
 
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.7.2
+
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_local_notifications: 17.2.1
-  flutter_background_service: ^5.0.1
 
-  shared_preferences: ^2.2.2
   google_fonts: ^6.1.0
   intl: ^0.19.0
   uuid: ^4.0.0
@@ -21,11 +21,16 @@ dependencies:
   lottie: ^2.6.0
   simple_animations: ^5.0.0
   permission_handler: ^11.0.1
+  flutter_svg: ^2.0.7
+  path_drawing: ^1.0.1
+  shared_preferences: ^2.2.2
+  easy_localization: ^3.0.1
+  google_sign_in: ^6.1.4
+  flutter_facebook_auth: ^7.0.1
 
 
 
-
-
+  cupertino_icons: ^1.0.8
 
   # دعم اللغة العربية
   flutter_localizations:
@@ -37,17 +42,34 @@ dev_dependencies:
   flutter_lints: ^3.0.1
   flutter_launcher_icons: ^0.13.1
 
+
+
 flutter:
   uses-material-design: true
   generate: true
   assets:
-    -  assets/logo.png
-    -  assets/logo_animation.json
-    -  assets/sounds/intro_chime.mp3
-    -  assets/icons/app_icon.png
-    -  assets/lottie/Animation-1745156917515.json
-    -  assets/animation/Animation-1745156917515.json
-    -  assets/images/logo_white.png
+    - assets/logo.png
+    - assets/logo_animation.json
+    - assets/sounds/intro_chime.mp3
+    - assets/icons/app_icon.png
+    - assets/lottie/Animation-1745156917515.json
+    - assets/animation/Animation-1745156917515.json
+    - assets/images/logo_white.png
+    - assets/images/onboarding_1.svg
+    - assets/images/onboarding_1_grey_blur.svg
+    - assets/images/waqty_logo.svg
+    - assets/images/small_Shape.svg
+    - assets/images/waqty_logo_shadow.svg
+    - assets/images/logo_blue.svg
+    - assets/icons/globe.svg
+    - assets/icons/english_button.svg
+    - assets/icons/arabic_button.svg
+    - assets/images/background_sheap.svg
+    - assets/images/background_sheap_grey_blur.svg
+    - assets/translations/
+    - assets/icons/google.svg
+    - assets/icons/facebook.svg
+
 
 
 
@@ -64,5 +86,4 @@ flutter_icons:
   adaptive_icon_foreground: "assets/icons/app_icon.png"
   remove_alpha_ios: true
 
-
-
+flutter_lints: ^5.0.0

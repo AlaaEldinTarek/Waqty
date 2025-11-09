@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:simple_animations/simple_animations.dart';
 import 'package:lottie/lottie.dart';
-import '../view_task_screen.dart';
+
+import 'language_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final Function(bool) onToggleTheme;
@@ -26,8 +27,10 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _fadeAnimation =
-        CurvedAnimation(parent: _fadeController, curve: Curves.easeIn);
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeIn,
+    );
 
     Timer(const Duration(seconds: 2), () {
       setState(() => _showStaticLogo = true);
@@ -36,9 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => ViewTasksScreen(onToggleTheme: widget.onToggleTheme),
-        ),
+        MaterialPageRoute(builder: (_) => const LanguageSelectionPage()),
       );
     });
   }
@@ -53,13 +54,21 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: LoopAnimationBuilder<double>(
-        tween: Tween(begin: 1.0, end: 1.5),
+        tween: Tween(begin: 1, end: 1.5),
         duration: const Duration(seconds: 6),
         builder: (context, value, child) {
-          final color1 = Color.lerp(
-              const Color(0xFF000080), const Color(0xff0000ff), value)!;
-          final color2 = Color.lerp(
-              const Color(0xff0000ff), const Color(0xFF000080), value)!;
+          final color1 =
+              Color.lerp(
+                const Color(0xFF247BE4),
+                const Color(0xff0000ff),
+                value,
+              )!;
+          final color2 =
+              Color.lerp(
+                const Color(0xff0000ff),
+                const Color(0xFF247BE4),
+                value,
+              )!;
 
           return Container(
             decoration: BoxDecoration(

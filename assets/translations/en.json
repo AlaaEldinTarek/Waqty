@@ -1,0 +1,22 @@
+{
+  "app_name": "Waqti",
+  "change_language": "Change language",
+  "onboarding_text": "Manage your time easily!",
+  "start": "Start",
+  "login_title": "Login",
+  "welcome_back": "Welcome back",
+  "email_or_username": "Email / Username",
+  "password": "Password",
+  "remember_me": "Remember me",
+  "forgot_password": "Forgot password?",
+  "no_account": "Don’t have an account?",
+  "organize_your_time": "Organize your time easily!",
+  "log_in": "Log In!",
+  "or_continue_with": "or continue with",
+  "create_account": "Create your account",
+  "sign_up": "Sign Up",
+  "full_name": "Full Name",
+  "email": "Email",
+  "confirm_password": "Confirm Password",
+  "Already have account": "Already have an account?"
+}

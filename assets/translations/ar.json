@@ -1,0 +1,23 @@
+{
+  "app_name": "وقتي",
+  "change_language": "تغيير اللغة",
+  "onboarding_text": "نظم وقتك بسهولة!",
+  "start": "إبـــدأ",
+  "login_title": "تسجيل الدخول",
+  "welcome_back": "مرحباً بعودتك",
+  "email_or_username": "بريد إلكتروني / اسم المستخدم",
+  "password": "كلمة المرور",
+  "remember_me": "تذكرني",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "no_account": "ليس لديك حساب؟",
+  "organize_your_time": "نظّم وقتك بسهولة!",
+  "log_in": "تسجيل الدخول",
+  "or_continue_with": "أو تابع باستخدام",
+  "create_account": "أنشئ حسابك الجديد",
+  "sign_up": "تسجيل حساب جديد",
+  "full_name": "الاسم الكامل",
+  "email": "البريد الإلكتروني",
+  "confirm_password": "تأكيد كلمة المرور",
+  "hello": "مرحبـا,",
+  "Already have account": "أملك حسابًا بالفعل؟"
+}
